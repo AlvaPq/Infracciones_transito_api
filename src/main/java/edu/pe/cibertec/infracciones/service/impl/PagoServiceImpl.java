@@ -70,4 +70,5 @@ public class PagoServiceImpl implements IPagoService {
         dto.setMultaId(pago.getMulta().getId());
         return dto;
     }
+
 }
