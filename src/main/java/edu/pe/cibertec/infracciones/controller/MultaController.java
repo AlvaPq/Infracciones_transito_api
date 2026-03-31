@@ -35,4 +35,10 @@ public class MultaController {
     public ResponseEntity<List<MultaResponseDTO>> obtenerPorVehiculo(@PathVariable Long vehiculoId) {
         return ResponseEntity.ok(multaService.obtenerMultasPorVehiculo(vehiculoId));
     }
+
+
+    @PostMapping("/actualizar-estados")
+    public ResponseEntity<Void> actualizarEstados() {multaService.actualizarEstados();
+        return ResponseEntity.ok().build();
+    }
 }
