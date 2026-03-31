@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
     private PagoServiceImpl pagoService;
 
     @Test
-    @DisplayName("Debe aplicar 20porciento de descuento si se paga el mismo día")
+    @DisplayName("Debe aplicar 20porciento de descuento si se paga el mismo dia")
     void debeAplicarDescuento20Porciento() {
 
         Multa multa = new Multa();
@@ -53,4 +53,33 @@ import static org.mockito.Mockito.*;
         verify(pagoRepository, times(1)).save(any(Pago.class));
         verify(multaRepository, times(1)).save(multa);
     }
+    @Test
+    @DisplayName("Debe aplicar recargo cuando multa está vencida")
+    void debeAplicarRecargoEnMultaVencida() {
+
+
+        Multa multa = new Multa();
+        multa.setId(1L);
+        multa.setMonto(500.0);
+        multa.setEstado(EstadoMulta.PENDIENTE);
+        multa.setFechaEmision(LocalDate.now().minusDays(12));
+        multa.setFechaVencimiento(LocalDate.now().minusDays(2));
+
+        when(multaRepository.findById(1L)).thenReturn(Optional.of(multa));
+
+
+        ArgumentCaptor<Pago> pagoCaptor = ArgumentCaptor.forClass(Pago.class);
+
+
+        pagoService.procesarPago(1L);
+        verify(pagoRepository, times(1)).save(pagoCaptor.capture());
+
+        Pago pagoGuardado = pagoCaptor.getValue();
+
+        assertEquals(75.0, pagoGuardado.getRecargo());
+        assertEquals(0.0, pagoGuardado.getDescuentoAplicado());
+        assertEquals(575.0, pagoGuardado.getMontoPagado());
+    }
+
+
 }
